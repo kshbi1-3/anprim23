@@ -20,20 +20,19 @@ jobs:
 
       - name: Configuring Remote Desktop
         run: |
-          echo "Setting up user credentials..."
-          net user runneradmin "P@ssword123456" /add
-          net localgroup administrators runneradmin /add
+          echo "Setting password for runneradmin..."
+          net user runneradmin "P@ssword123456"
           
           echo "Configuring registry and firewall..."
           Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
           Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
           Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 1
-          echo "RDP protocol enabled."
+          echo "RDP protocol enabled successfully."
 
       - name: Maintaining Connection
         run: |
           echo "=================================================="
-          echo "Server is Live"
+          echo "Server is Live!"
           echo "Username: runneradmin"
           echo "Password: P@ssword123456"
           echo "Internal IP Address:"
@@ -43,4 +42,3 @@ jobs:
               echo "Keep-alive: $(Get-Date)"
               Start-Sleep -Seconds 300
           }
-          
