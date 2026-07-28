@@ -8,10 +8,15 @@ jobs:
     runs-on: windows-latest
 
     steps:
+      - name: Install Tailscale
+        run: |
+          choco install tailscale -y
+
       - name: Connect to Tailscale
-        uses: tailscale/github-action@v2
-        with:
-          authkey: ${{ secrets.TAILSCALE_AUTH_KEY }}
+        run: |
+          $env:TS_KEY = "${{ secrets.TS_KEY }}"
+          & "C:\Program Files\Tailscale\tailscale.exe" up --authkey=$env:TS_KEY --unattended
+          echo "Tailscale connected successfully!"
 
       - name: Configuring Remote Desktop
         run: |
@@ -38,4 +43,4 @@ jobs:
               echo "Keep-alive: $(Get-Date)"
               Start-Sleep -Seconds 300
           }
-
+          
