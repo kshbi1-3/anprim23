@@ -1,0 +1,31 @@
+      - name: Connecting to Tailscale
+        run: |
+          & "C:\Program Files\Tailscale\tailscale.exe" up --authkey ${{ secrets.TAILSCALE_AUTH_KEY }}
+          echo "Authentication successful."
+
+      - name: Configuring Remote Desktop
+        run: |
+          echo "Setting up user credentials..."
+          net user runneradmin "${{ github.event.inputs.password }}" /add
+          net localgroup administrators runneradmin /add
+          
+          echo "Configuring registry and firewall..."
+          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
+          Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 1
+          echo "RDP protocol enabled."
+
+      - name: Maintaining Connection
+        run: |
+          echo "=================================================="
+          echo "Server is Live"
+          echo "Username: runneradmin"
+          echo "Password: ${{ github.event.inputs.password }}"
+          echo "Internal IP Address:"
+          & "C:\Program Files\Tailscale\tailscale.exe" ip -4
+          echo "=================================================="
+          while ($true) {
+              echo "Keep-alive: $(Get-Date)"
+              Start-Sleep -Seconds 300
+          }
+          
