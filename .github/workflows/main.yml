@@ -1,3 +1,21 @@
+name: RDP via Tailscale
+
+on:
+  workflow_dispatch:
+    inputs:
+      password:
+        description: 'RDP Password'
+        required: true
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Install Tailscale
+        run: |
+          choco install tailscale -y
+
       - name: Connecting to Tailscale
         run: |
           & "C:\Program Files\Tailscale\tailscale.exe" up --authkey ${{ secrets.TAILSCALE_AUTH_KEY }}
