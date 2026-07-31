@@ -1,4 +1,4 @@
-name: RDP via Tailscale
+Name: RDP via Tailscale with Arch Linux WSL
 
 on:
   workflow_dispatch
@@ -18,7 +18,29 @@ jobs:
           & "C:\Program Files\Tailscale\tailscale.exe" up --authkey=$env:TS_KEY --unattended
           echo "Tailscale connected successfully!"
 
-      - name: Configuring Remote Desktop
+      - name: Install WSL and Arch Linux
+        shell: powershell
+        run: |
+          echo "Enabling WSL..."
+          dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+          dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
+
+          echo "Downloading Arch Linux for WSL..."
+          Invoke-WebRequest -Uri "https://github.com/yuk7/ArchWSL/releases/latest/download/Arch.zip" -OutFile "Arch.zip"
+          Expand-Archive -Path "Arch.zip" -DestinationPath "C:\ArchWSL"
+          
+          echo "Registering Arch Linux..."
+          cd C:\ArchWSL
+          .\Arch.exe --default-uid 0
+
+          echo "Setting up Java inside Arch Linux for Ghidra..."
+          wsl -d Arch -- pacman-key --init
+          wsl -d Arch -- pacman-key --populate archlinux
+          wsl -d Arch -- pacman -Sy --noconfirm jdk17-openjdk wget unzip
+
+          echo "Arch Linux with Java installed successfully!"
+
+      - name: Configuring Remote Desktop for Windows
         run: |
           echo "Setting password for runneradmin..."
           net user runneradmin "P@ssword123456"
@@ -35,7 +57,7 @@ jobs:
           echo "Server is Live!"
           echo "Username: runneradmin"
           echo "Password: P@ssword123456"
-          echo "Internal IP Address:"
+          echo "Tailscale IP:"
           & "C:\Program Files\Tailscale\tailscale.exe" ip -4
           echo "=================================================="
           while ($true) {
