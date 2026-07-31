@@ -1,4 +1,4 @@
-Name: RDP via Tailscale with Arch Linux WSL
+name: RDP via Tailscale with Arch Linux WSL
 
 on:
   workflow_dispatch
