@@ -21,18 +21,22 @@ jobs:
       - name: Install WSL and Arch Linux
         shell: powershell
         run: |
-          echo "Installing ArchWSL..."
+          echo "Enabling WSL feature..."
+          wsl --install --no-distribution
+
+          echo "Downloading ArchWSL..."
           Invoke-WebRequest -Uri "https://github.com/yuk7/ArchWSL/releases/latest/download/Arch.zip" -OutFile "Arch.zip"
           Expand-Archive -Path "Arch.zip" -DestinationPath "C:\ArchWSL"
           
+          echo "Registering and Installing Arch Linux..."
           cd C:\ArchWSL
-          # تشغيل التثبيت التلقائي دون خيارات ملغاة
-          .\Arch.exe --non-interactive
+          # تشغيل التثبيت الصامت الصحيح بدون وسائط إضافية
+          .\Arch.exe
 
-          echo "Updating Pacman Keys and Installing Java..."
-          wsl -d Arch -- pacman-key --init
-          wsl -d Arch -- pacman-key --populate archlinux
-          wsl -d Arch -- pacman -Sy --noconfirm jdk17-openjdk wget unzip
+          echo "Configuring Pacman Keys and Installing Java inside Arch..."
+          wsl -- pacman-key --init
+          wsl -- pacman-key --populate archlinux
+          wsl -- pacman -Sy --noconfirm jdk17-openjdk wget unzip
 
           echo "Arch Linux with Java installed successfully!"
 
